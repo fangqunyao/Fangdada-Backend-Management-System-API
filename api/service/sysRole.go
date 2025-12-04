@@ -25,13 +25,22 @@ type ISysRoleService interface {
 type SysRoleServiceImpl struct{}
 
 // CreateSysRole 新建角色
+// service/sys_role_service.go
 func (s SysRoleServiceImpl) CreateSysRole(c *gin.Context, dto entity.AddSysRoleDto) {
-	bool := dao.CreateSysRole(dto)
-	if !bool {
+	// 先检查是否存在（Service 层做业务校验）
+	if role := dao.GetSysRoleByName(dto.RoleName); role.ID > 0 {
 		result.Failed(c, int(result.ApiCode.ROLENAMEALREADYEXISTS),
 			result.ApiCode.GetMessage(result.ApiCode.ROLENAMEALREADYEXISTS))
 		return
 	}
+
+	// 再调用 DAO 创建
+	ok := dao.CreateSysRole(dto)
+	if !ok {
+		result.Failed(c, 500, "系统内部错误")
+		return
+	}
+
 	result.Success(c, true)
 }
 

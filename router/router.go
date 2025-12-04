@@ -25,6 +25,8 @@ func InitRouter() *gin.Engine {
 	router.Use(middleware.Logger())
 	register(router)
 	return router
+
+	
 }
 
 // register 路由接口

@@ -5,7 +5,6 @@ package middleware
 import (
 	"admin-go-api/api/dao"
 	"admin-go-api/api/entity"
-	"admin-go-api/common/util"
 	"admin-go-api/pkg/jwt"
 	"strings"
 	"time"
@@ -25,7 +24,7 @@ func LogMiddleware() gin.HandlerFunc {
 				Method:     method,
 				Ip:         c.ClientIP(),
 				Url:        c.Request.URL.Path,
-				CreateTime: util.HTime{Time: time.Now()},
+				CreateTime: time.Now(),
 			}
 			dao.CreateSysOperationLog(log)
 		}

@@ -45,16 +45,16 @@ type LoginDto struct {
 
 // AddSysAdminDto 新增参数
 type AddSysAdminDto struct {
-	PostId   int    `validate:"required"` // 岗位id
-	RoleId   uint   `validate:"required"` // 角色id
-	DeptId   int    `validate:"required"` // 部门id
-	Username string `validate:"required"` // 用户名
-	Password string `validate:"required"` // 密码
-	Nickname string `validate:"required"` // 昵称
-	Phone    string `validate:"required"` // 手机号
-	Email    string `validate:"required"` // 邮箱
-	Note     string // 备注
-	Status   int    `validate:"required"` // 状态：1->启用,2->禁用
+	PostId   int    `json:"postId" validate:"required"`   // 岗位id
+	RoleId   uint   ` json:"roleId" validate:"required"`   // 角色id
+	DeptId   int    `json:"deptId" validate:"required"`   // 部门id
+	Username string `json:"username" validate:"required"` // 用户名
+	Password string `json:"password" validate:"required"` // 密码
+	Nickname string `json:"nickname" validate:"required"` // 昵称
+	Phone    string `json:"phone" validate:"required"`    // 手机号
+	Email    string `json:"email" validate:"required"`    // 邮箱
+	Note     string `json:"note"`                         // 备注
+	Status   int    `json:"status" validate:"required"`   // 状态：1->启用,2->禁用
 }
 
 // 详情视图
@@ -93,7 +93,7 @@ type SysAdminIdDto struct {
 // 设置状态参数
 type UpdateSysAdminStatusDto struct {
 	Id     uint // ID
-	Status int  // 状态：1->启用,2->禁用
+	Status int  // 状态：1->启用,0->禁用
 }
 
 // 重置密码参数
@@ -107,7 +107,7 @@ type SysAdminVo struct {
 	ID         uint       `json:"id"`         // ID
 	Username   string     `json:"username"`   // 用户名
 	Nickname   string     `json:"nickname"`   // 昵称
-	Status     int        `json:"status"`     // 状态：1->启用,2->禁用
+	Status     int        `json:"status"`     // 状态：1->启用,0->禁用
 	PostId     int        `json:"postId"`     // 岗位id
 	DeptId     int        `json:"deptId"`     // 部门id
 	RoleId     uint       `json:"roleId" `    // 角色id
