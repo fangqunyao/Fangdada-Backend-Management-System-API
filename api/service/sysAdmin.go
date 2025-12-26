@@ -8,7 +8,6 @@ import (
 	"admin-go-api/common/result"
 	"admin-go-api/common/util"
 	"admin-go-api/pkg/jwt"
-	. "admin-go-api/pkg/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -207,72 +206,41 @@ func (s SysAdminServiceImpl) GetCurrentUserPermissions(c *gin.Context) {
 		return
 	}
 
-	// 调试信息：检查用户角色关联
-	var userRoles []map[string]interface{}
-	Db.Table("sys_admin").
-		Select("sys_admin.id, sys_admin.username, sys_role.id as role_id, sys_role.role_name, sys_role.status as role_status").
-		Joins("LEFT JOIN sys_admin_role ON sys_admin.id = sys_admin_role.admin_id").
-		Joins("LEFT JOIN sys_role ON sys_role.id = sys_admin_role.role_id").
-		Where("sys_admin.id = ?", admin.ID).
-		Scan(&userRoles)
+	// 菜单列表
+	var menus []entity.LeftMenuVo
+	leftMenuList := dao.QueryLeftMenuList(admin.ID)
+	for _, value := range leftMenuList {
+		menuSvoList := dao.QueryMenuVoList(admin.ID, value.Id)
+		item := entity.LeftMenuVo{
+			Id:         value.Id,
+			MenuName:   value.MenuName,
+			Icon:       value.Icon,
+			Url:        value.Url,
+			MenuSvoList: menuSvoList,
+		}
+		menus = append(menus, item)
+	}
 
-	// 调试信息：检查菜单数据
-	var totalMenus int64
-	Db.Model(&entity.SysMenu{}).Where("menu_status = ? AND menu_type = ?", 2, 1).Count(&totalMenus)
-
-	var activeMenus int64
-	Db.Model(&entity.SysMenu{}).Where("menu_status = ?", 2).Count(&activeMenus)
-
-	// 临时修复：如果没有权限数据，直接返回空的菜单和权限列表
-	// 这是为了让前端能正常工作，后续需要完善数据库权限数据
-	var leftMenuVo []entity.LeftMenuVo
-	var stringList []string
-
-	// 检查用户是否有角色
-	hasRole := false
-	for _, role := range userRoles {
-		if role["role_id"] != nil {
-			hasRole = true
-			break
+	// 权限路径列表（用于前端路由鉴权）
+	var permissions []string
+	permissionList := dao.QueryPermissionList(admin.ID)
+	for _, value := range permissionList {
+		if value.Value != "" {
+			permissions = append(permissions, value.Value)
 		}
 	}
 
-	if hasRole && totalMenus > 0 {
-		// 有角色和菜单数据时，正常查询
-		leftMenuList := dao.QueryLeftMenuList(admin.ID)
-		for _, value := range leftMenuList {
-			menuSvoList := dao.QueryMenuVoList(admin.ID, value.Id)
-			item := entity.LeftMenuVo{}
-			item.MenuSvoList = menuSvoList
-			item.Id = value.Id
-			item.MenuName = value.MenuName
-			item.Icon = value.Icon
-			item.Url = value.Url
-			leftMenuVo = append(leftMenuVo, item)
-		}
-
-		// 权限列表
-		permissionList := dao.QueryPermissionList(admin.ID)
-		for _, value := range permissionList {
-			stringList = append(stringList, value.Value)
-		}
-	} else {
-		// 没有权限数据时，返回空列表，让前端知道没有权限
-		leftMenuVo = []entity.LeftMenuVo{}
-		stringList = []string{}
+	// 调试信息：检查各种数据
+	var debugInfo = map[string]interface{}{
+		"userId": admin.ID,
+		"leftMenuListCount": len(leftMenuList),
+		"permissionsCount": len(permissions),
 	}
 
 	result.Success(c, map[string]interface{}{
-		"userInfo": admin,
-		"userRoles": userRoles,
-		"debugInfo": map[string]interface{}{
-			"totalMenus": totalMenus,
-			"activeMenus": activeMenus,
-			"hasRole": hasRole,
-			"note": "如果没有权限数据，建议完善数据库中的角色和菜单关联",
-		},
-		"leftMenuList": leftMenuVo,
-		"permissionList": stringList,
+		"menus":      menus,
+		"permissions": permissions,
+		"_debug":     debugInfo, // 临时调试信息
 	})
 }
 

@@ -45,11 +45,12 @@ type MenuSvo struct {
 
 // 左侧菜单vo
 type LeftMenuVo struct {
-	Id          uint      `json:"id"`          // ID
-	MenuName    string    `json:"menuName"`    // 菜单名称
-	Icon        string    `json:"icon"`        // 图标
-	Url         string    `json:"url"`         // url
-	MenuSvoList []MenuSvo `json:"menuSvoList"` // 菜单列表
+	Id          uint      `json:"id"`                   // ID
+	MenuName    string    `json:"menuName"`             // 菜单名称
+	Icon        string    `json:"icon"`                 // 图标
+	Url         string    `json:"url"`                  // url
+	Sort        uint      `json:"sort"`                 // 排序
+	MenuSvoList []MenuSvo `json:"menuSvoList" gorm:"-"` // 菜单列表
 }
 
 // 权限vo
