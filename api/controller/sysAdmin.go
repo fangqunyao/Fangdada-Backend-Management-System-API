@@ -74,7 +74,10 @@ func UpdateSysAdmin(c *gin.Context) {
 // @Security ApiKeyAuth
 func DeleteSysAdminById(c *gin.Context) {
 	var dto entity.SysAdminIdDto
-	_ = c.BindJSON(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 	service.SysAdminService().DeleteSysAdminById(c, dto)
 }
 

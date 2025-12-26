@@ -6,7 +6,11 @@ import (
 	"admin-go-api/api/entity"
 	"admin-go-api/common/util"
 	. "admin-go-api/pkg/db"
+	"errors"
+	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // SysAdminDetail 用户详情
@@ -94,10 +98,48 @@ func UpdateSysAdmin(dto entity.UpdateSysAdminDto) (sysAdmin entity.SysAdmin) {
 }
 
 // 根据id删除用户
-func DeleteSysAdminById(dto entity.SysAdminIdDto) {
-	Db.First(&entity.SysAdmin{}, dto.Id)
-	Db.Delete(&entity.SysAdmin{}, dto.Id)
-	Db.Where("admin_id = ?", dto.Id).Delete(&entity.SysAdminRole{})
+func DeleteSysAdminById(dto entity.SysAdminIdDto) error {
+	// 1. 校验 ID 合法性
+	if dto.Id == 0 {
+		return errors.New("invalid admin ID")
+	}
+
+	// 2. 启用事务
+	tx := Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 3. 检查用户是否存在
+	var admin entity.SysAdmin
+	if err := tx.First(&admin, dto.Id).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	// 4. 删除关联的角色（先删子表）
+	if err := tx.Where("admin_id = ?", dto.Id).Delete(&entity.SysAdminRole{}).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete roles: %w", err)
+	}
+
+	// 5. 删除主表用户
+	if err := tx.Delete(&entity.SysAdmin{}, dto.Id).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+
+	// 6. 提交事务
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("transaction commit failed: %w", err)
+	}
+
+	return nil
 }
 
 // 修改用户状态

@@ -46,7 +46,7 @@ type LoginDto struct {
 // AddSysAdminDto 新增参数
 type AddSysAdminDto struct {
 	PostId   int    `json:"postId" validate:"required"`   // 岗位id
-	RoleId   uint   ` json:"roleId" validate:"required"`   // 角色id
+	RoleId   uint   ` json:"roleId" validate:"required"`  // 角色id
 	DeptId   int    `json:"deptId" validate:"required"`   // 部门id
 	Username string `json:"username" validate:"required"` // 用户名
 	Password string `json:"password" validate:"required"` // 密码
@@ -87,7 +87,7 @@ type UpdateSysAdminDto struct {
 
 // Id参数
 type SysAdminIdDto struct {
-	Id uint `json:"id"` // ID
+	Id uint `form:"id" binding:"required,min=1"`
 }
 
 // 设置状态参数
