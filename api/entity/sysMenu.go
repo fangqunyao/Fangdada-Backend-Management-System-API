@@ -38,9 +38,11 @@ type SysMenuVo struct {
 
 // 菜单级vo
 type MenuSvo struct {
+	Id       uint   `json:"id"`       // ID
 	MenuName string `json:"menuName"` // 菜单名称
 	Icon     string `json:"icon"`     // 图标
 	Url      string `json:"url"`      // url
+	MenuType uint   `json:"menuType"` // 菜单类型
 }
 
 // 左侧菜单vo
@@ -50,6 +52,7 @@ type LeftMenuVo struct {
 	Icon        string    `json:"icon"`                 // 图标
 	Url         string    `json:"url"`                  // url
 	Sort        uint      `json:"sort"`                 // 排序
+	MenuType    uint      `json:"menuType"`             // 菜单类型
 	MenuSvoList []MenuSvo `json:"menuSvoList" gorm:"-"` // 菜单列表
 }
 

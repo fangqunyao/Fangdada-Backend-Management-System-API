@@ -128,7 +128,7 @@ func GetSysMenuList(MenuName string, MenuStatus string) (sysMenu []*entity.SysMe
 func QueryMenuVoList(AdminId, MenuId uint) (menuSvo []entity.MenuSvo) {
 	const status, menuStatus, menuType uint = 1, 2, 2
 	Db.Table("sys_menu sm").
-		Select("sm.menu_name, sm.icon, sm.url").
+		Select("sm.id, sm.menu_name, sm.icon, sm.url, sm.menu_type").
 		Joins("INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id").
 		Joins("INNER JOIN sys_role sr ON sr.id = srm.role_id").
 		Joins("INNER JOIN sys_admin_role sar ON sar.role_id = sr.id").
@@ -147,7 +147,7 @@ func QueryMenuVoList(AdminId, MenuId uint) (menuSvo []entity.MenuSvo) {
 func QueryLeftMenuList(Id uint) (leftMenuVo []entity.LeftMenuVo) {
 	const status, menuStatus, menuType uint = 1, 2, 1
 	Db.Table("sys_menu sm").
-		Select("DISTINCT sm.id, sm.menu_name, sm.url, sm.icon, sm.sort").
+		Select("DISTINCT sm.id, sm.menu_name, sm.url, sm.icon, sm.sort, sm.menu_type").
 		Joins("INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id").
 		Joins("INNER JOIN sys_role sr ON sr.id = srm.role_id").
 		Joins("INNER JOIN sys_admin_role sar ON sar.role_id = sr.id").

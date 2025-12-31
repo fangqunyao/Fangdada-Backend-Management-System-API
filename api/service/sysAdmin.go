@@ -212,11 +212,12 @@ func (s SysAdminServiceImpl) GetCurrentUserPermissions(c *gin.Context) {
 	for _, value := range leftMenuList {
 		menuSvoList := dao.QueryMenuVoList(admin.ID, value.Id)
 		item := entity.LeftMenuVo{
-			Id:         value.Id,
-			MenuName:   value.MenuName,
-			Icon:       value.Icon,
-			Url:        value.Url,
+			Id:          value.Id,
+			MenuName:    value.MenuName,
+			Icon:        value.Icon,
+			Url:         value.Url,
 			MenuSvoList: menuSvoList,
+			MenuType:    value.MenuType,
 		}
 		menus = append(menus, item)
 	}
@@ -230,17 +231,9 @@ func (s SysAdminServiceImpl) GetCurrentUserPermissions(c *gin.Context) {
 		}
 	}
 
-	// 调试信息：检查各种数据
-	var debugInfo = map[string]interface{}{
-		"userId": admin.ID,
-		"leftMenuListCount": len(leftMenuList),
-		"permissionsCount": len(permissions),
-	}
-
 	result.Success(c, map[string]interface{}{
-		"menus":      menus,
+		"menus":       menus,
 		"permissions": permissions,
-		"_debug":     debugInfo, // 临时调试信息
 	})
 }
 
