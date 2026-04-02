@@ -5,22 +5,20 @@ package controller
 import (
 	"admin-go-api/api/entity"
 	"admin-go-api/api/service"
+	"admin-go-api/common/result"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 // CreateSysRole 新增角色
-// @Summary 新增角色接口
-// @Produce json
-// @Description 新增角色接口
-// @Param data body entity.AddSysRoleDto true "data"
-// @Success 200 {object} result.Result
-// @router /api/role/add [post]
-// @Security ApiKeyAuth
 func CreateSysRole(c *gin.Context) {
 	var dto entity.AddSysRoleDto
-	_ = c.BindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		result.Failed(c, http.StatusBadRequest, "请求参数错误")
+		return
+	}
 	service.SysRoleService().CreateSysRole(c, dto)
 }
 
@@ -59,9 +57,19 @@ func UpdateSysRole(c *gin.Context) {
 // @Success 200 {object} result.Result
 // @router /api/role/delete [delete]
 // @Security ApiKeyAuth
+// api/handler/sysRole.go
 func DeleteSysRoleById(c *gin.Context) {
 	var dto entity.SysRoleIdDto
-	_ = c.BindJSON(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "缺少或无效的角色ID"})
+		return
+	}
+
+	if dto.Id == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "角色ID不能为0"})
+		return
+	}
+
 	service.SysRoleService().DeleteSysRoleById(c, dto)
 }
 

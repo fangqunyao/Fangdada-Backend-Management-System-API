@@ -4,8 +4,8 @@ package dao
 
 import (
 	"admin-go-api/api/entity"
-	"admin-go-api/common/util"
 	. "admin-go-api/pkg/db"
+	"log"
 
 	"time"
 )
@@ -24,26 +24,26 @@ func GetSysRoleByKey(roleKey string) (sysRole entity.SysRole) {
 
 // CreateSysRole 新增角色
 func CreateSysRole(dto entity.AddSysRoleDto) bool {
-	sysRoleByName := GetSysRoleByName(dto.RoleName)
-	if sysRoleByName.ID > 0 {
-		return false
+	// 先查是否已存在
+	if role := GetSysRoleByName(dto.RoleName); role.ID > 0 {
+		return false // 明确：因为已存在而失败
 	}
-	sysRoleByKey := GetSysRoleByKey(dto.RoleKey)
-	if sysRoleByKey.ID > 0 {
-		return false
-	}
+
 	addSysRole := entity.SysRole{
 		RoleName:    dto.RoleName,
 		RoleKey:     dto.RoleKey,
 		Description: dto.Description,
 		Status:      dto.Status,
-		CreateTime:  util.HTime{Time: time.Now()},
+		CreateTime:  time.Now(),
 	}
-	tx := Db.Create(&addSysRole)
-	if tx.RowsAffected > 0 {
-		return true
+
+	result := Db.Create(&addSysRole)
+	if result.Error != nil {
+		log.Printf("创建角色失败: %v", result.Error)
+		return false
 	}
-	return false
+
+	return result.RowsAffected > 0
 }
 
 // GetSysRoleById 根据id获取详情
@@ -97,7 +97,7 @@ func GetSysRoleList(PageNum int, PageSize int, RoleName string, status string,
 		curDb = curDb.Where("status = ?", status)
 	}
 	curDb.Count(&count)
-	curDb.Limit(PageSize).Offset((PageNum - 1) * PageSize).Order("create_time DESC").Find(&sysRole)
+	curDb.Limit(PageSize).Offset((PageNum - 1) * PageSize).Order("create_time ASC").Find(&sysRole)
 	return sysRole, count
 }
 

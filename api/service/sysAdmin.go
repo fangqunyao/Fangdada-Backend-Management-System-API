@@ -25,6 +25,7 @@ type ISysAdminService interface {
 	GetSysAdminList(c *gin.Context, PageSize, PageNum int, Username, Status, BeginTime, EndTime string)
 	UpdatePersonal(c *gin.Context, dto entity.UpdatePersonalDto)
 	UpdatePersonalPassword(c *gin.Context, dto entity.UpdatePersonalPasswordDto)
+	GetCurrentUserPermissions(c *gin.Context)
 }
 type SysAdminServiceImpl struct{}
 
@@ -195,6 +196,45 @@ func (s SysAdminServiceImpl) UpdatePersonalPassword(c *gin.Context, dto entity.U
 	tokenString, _ := jwt.GenerateTokenByAdmin(sysAdminUpdatePwd)
 	result.Success(c, map[string]interface{}{"token": tokenString, "sysAdmin": sysAdminUpdatePwd})
 	return
+}
+
+// GetCurrentUserPermissions 获取当前用户权限和菜单
+func (s SysAdminServiceImpl) GetCurrentUserPermissions(c *gin.Context) {
+	admin, err := jwt.GetAdmin(c)
+	if err != nil {
+		result.Failed(c, int(result.ApiCode.INVALIDTOKEN), result.ApiCode.GetMessage(result.ApiCode.INVALIDTOKEN))
+		return
+	}
+
+	// 菜单列表
+	var menus []entity.LeftMenuVo
+	leftMenuList := dao.QueryLeftMenuList(admin.ID)
+	for _, value := range leftMenuList {
+		menuSvoList := dao.QueryMenuVoList(admin.ID, value.Id)
+		item := entity.LeftMenuVo{
+			Id:          value.Id,
+			MenuName:    value.MenuName,
+			Icon:        value.Icon,
+			Url:         value.Url,
+			MenuSvoList: menuSvoList,
+			MenuType:    value.MenuType,
+		}
+		menus = append(menus, item)
+	}
+
+	// 权限路径列表（用于前端路由鉴权）
+	var permissions []string
+	permissionList := dao.QueryPermissionList(admin.ID)
+	for _, value := range permissionList {
+		if value.Value != "" {
+			permissions = append(permissions, value.Value)
+		}
+	}
+
+	result.Success(c, map[string]interface{}{
+		"menus":       menus,
+		"permissions": permissions,
+	})
 }
 
 var sysAdminService = SysAdminServiceImpl{}

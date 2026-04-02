@@ -25,6 +25,8 @@ func InitRouter() *gin.Engine {
 	router.Use(middleware.Logger())
 	register(router)
 	return router
+
+	
 }
 
 // register 路由接口
@@ -78,6 +80,7 @@ func register(router *gin.Engine) {
 		jwt.PUT("/admin/updateStatus", controller.UpdateSysAdminStatus)
 		jwt.PUT("/admin/updatePassword", controller.ResetSysAdminPassword)
 		jwt.GET("/admin/list", controller.GetSysAdminList)
+		jwt.GET("/admin/permissions", controller.GetCurrentUserPermissions)
 		jwt.POST("/upload", controller.Upload)
 		jwt.PUT("/admin/updatePersonal", controller.UpdatePersonal)
 		jwt.PUT("/admin/updatePersonalPassword", controller.UpdatePersonalPassword)

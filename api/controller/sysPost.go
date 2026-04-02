@@ -75,7 +75,10 @@ func DeleteSysPostById(c *gin.Context) {
 // @Security ApiKeyAuth
 func BatchDeleteSysPost(c *gin.Context) {
 	var dto entity.DelSysPostDto
-	_ = c.BindJSON(&dto)
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(400, gin.H{"code": 400, "msg": err, "data": nil})
+		return
+	}
 	service.SysPostService().BatchDeleteSysPost(c, dto)
 }
 

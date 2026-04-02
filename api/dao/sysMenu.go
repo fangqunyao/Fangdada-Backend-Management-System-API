@@ -128,11 +128,11 @@ func GetSysMenuList(MenuName string, MenuStatus string) (sysMenu []*entity.SysMe
 func QueryMenuVoList(AdminId, MenuId uint) (menuSvo []entity.MenuSvo) {
 	const status, menuStatus, menuType uint = 1, 2, 2
 	Db.Table("sys_menu sm").
-		Select("sm.menu_name, sm.icon, sm.url").
-		Joins("LEFT JOIN sys_role_menu srm ON sm.id = srm.menu_id").
-		Joins("LEFT JOIN sys_role sr ON sr.id = srm.role_id").
-		Joins("LEFT JOIN sys_admin_role sar ON sar.role_id = sr.id").
-		Joins("LEFT JOIN sys_admin sa ON sa.id = sar.admin_id").
+		Select("sm.id, sm.menu_name, sm.icon, sm.url, sm.menu_type").
+		Joins("INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id").
+		Joins("INNER JOIN sys_role sr ON sr.id = srm.role_id").
+		Joins("INNER JOIN sys_admin_role sar ON sar.role_id = sr.id").
+		Joins("INNER JOIN sys_admin sa ON sa.id = sar.admin_id").
 		Where("sr.status = ?", status).
 		Where("sm.menu_status = ?", menuStatus).
 		Where("sm.menu_type = ?", menuType).
@@ -147,11 +147,11 @@ func QueryMenuVoList(AdminId, MenuId uint) (menuSvo []entity.MenuSvo) {
 func QueryLeftMenuList(Id uint) (leftMenuVo []entity.LeftMenuVo) {
 	const status, menuStatus, menuType uint = 1, 2, 1
 	Db.Table("sys_menu sm").
-		Select("sm.id, sm.menu_name, sm.url, sm.icon").
-		Joins("LEFT JOIN sys_role_menu srm ON sm.id = srm.menu_id").
-		Joins("LEFT JOIN sys_role sr ON sr.id = srm.role_id").
-		Joins("LEFT JOIN sys_admin_role sar ON sar.role_id = sr.id").
-		Joins("LEFT JOIN sys_admin sa ON sa.id = sar.admin_id").
+		Select("DISTINCT sm.id, sm.menu_name, sm.url, sm.icon, sm.sort, sm.menu_type").
+		Joins("INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id").
+		Joins("INNER JOIN sys_role sr ON sr.id = srm.role_id").
+		Joins("INNER JOIN sys_admin_role sar ON sar.role_id = sr.id").
+		Joins("INNER JOIN sys_admin sa ON sa.id = sar.admin_id").
 		Where("sr.status = ?", status).
 		Where("sm.menu_status = ?", menuStatus).
 		Where("sm.menu_type = ?", menuType).
@@ -165,11 +165,11 @@ func QueryLeftMenuList(Id uint) (leftMenuVo []entity.LeftMenuVo) {
 func QueryPermissionList(Id uint) (valueVo []entity.ValueVo) {
 	const status, menuStatus, menuType uint = 1, 2, 1
 	Db.Table("sys_menu sm").
-		Select("sm.value").
-		Joins("LEFT JOIN sys_role_menu srm ON sm.id = srm.menu_id").
-		Joins("LEFT JOIN sys_role sr ON sr.id = srm.role_id").
-		Joins("LEFT JOIN sys_admin_role sar ON sar.role_id = sr.id").
-		Joins("LEFT JOIN sys_admin sa ON sa.id = sar.admin_id").
+		Select("DISTINCT sm.value").
+		Joins("INNER JOIN sys_role_menu srm ON sm.id = srm.menu_id").
+		Joins("INNER JOIN sys_role sr ON sr.id = srm.role_id").
+		Joins("INNER JOIN sys_admin_role sar ON sar.role_id = sr.id").
+		Joins("INNER JOIN sys_admin sa ON sa.id = sar.admin_id").
 		Where("sr.status = ?", status).
 		Where("sm.menu_status = ?", menuStatus).
 		Not("sm.menu_type = ?", menuType).

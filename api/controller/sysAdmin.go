@@ -74,7 +74,10 @@ func UpdateSysAdmin(c *gin.Context) {
 // @Security ApiKeyAuth
 func DeleteSysAdminById(c *gin.Context) {
 	var dto entity.SysAdminIdDto
-	_ = c.BindJSON(&dto)
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
 	service.SysAdminService().DeleteSysAdminById(c, dto)
 }
 
@@ -156,4 +159,15 @@ func UpdatePersonalPassword(c *gin.Context) {
 	var dto entity.UpdatePersonalPasswordDto
 	_ = c.BindJSON(&dto)
 	service.SysAdminService().UpdatePersonalPassword(c, dto)
+}
+
+// GetCurrentUserPermissions 获取当前用户权限和菜单
+// @Summary 获取当前用户权限和菜单接口
+// @Produce json
+// @Description 获取当前用户权限和菜单接口
+// @Success 200 {object} result.Result
+// @router /api/admin/permissions [get]
+// @Security ApiKeyAuth
+func GetCurrentUserPermissions(c *gin.Context) {
+	service.SysAdminService().GetCurrentUserPermissions(c)
 }

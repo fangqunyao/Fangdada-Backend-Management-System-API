@@ -23,7 +23,7 @@ func (SysPost) TableName() string {
 // UpdateSysPostStatusDto 修改状态参数
 type UpdateSysPostStatusDto struct {
 	Id         int // ID
-	PostStatus int // 状态（1->正常 2->停用）
+	PostStatus int // 状态（1->正常 0->停用）
 }
 
 // SysPostIdDto Id参数
