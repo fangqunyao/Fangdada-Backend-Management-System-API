@@ -9,10 +9,12 @@ server:
 #数据库配置
 db:
   dialects: mysql
-  host: 127.0.0.1
+  host: 43.155.166.35
+  # host: 127.0.0.1
   port: 3306
   db: admin-go-api
-  username: root
+  # username: root
+  username: admin-go-api
   password: fqy010814
   charset: utf8
   #最大空闲数
