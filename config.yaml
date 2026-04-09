@@ -24,7 +24,7 @@ db:
 
 # redis配置
 redis:
-  address: 127.0.0.1:6379
+  address: 43.155.166.35:6379
   password: fqy010814
 
 # 图片地址和ip
