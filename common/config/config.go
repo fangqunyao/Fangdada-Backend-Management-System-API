@@ -5,6 +5,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath" // 1. 引入 path/filepath 包
 
 	"gopkg.in/yaml.v2"
 )
@@ -60,11 +61,27 @@ var Config *config
 
 // 配置初始化
 func init() {
-	// 使用 os.ReadFile
-	yamlFile, err := os.ReadFile("./config.yaml")
+	// --- 修改开始 ---
+
+	// 1. 获取当前可执行文件（main）的绝对路径
+	exePath, err := os.Executable()
 	if err != nil {
-		panic(fmt.Errorf("failed to read config file: %v", err))
+		panic(fmt.Errorf("failed to get executable path: %v", err))
 	}
+
+	// 2. 获取可执行文件所在的目录（例如：/www/wwwroot/admin-go）
+	exeDir := filepath.Dir(exePath)
+
+	// 3. 拼接出 config.yaml 的绝对路径
+	configPath := filepath.Join(exeDir, "config.yaml")
+
+	// 4. 使用绝对路径读取文件
+	yamlFile, err := os.ReadFile(configPath)
+	if err != nil {
+		panic(fmt.Errorf("failed to read config file at %s: %v", configPath, err))
+	}
+
+	// --- 修改结束 ---
 
 	// 绑定值
 	if err := yaml.Unmarshal(yamlFile, &Config); err != nil {
