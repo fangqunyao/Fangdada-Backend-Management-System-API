@@ -10,9 +10,13 @@ import (
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		// 允许特定域名或所有本地开发域名
-		if origin == "https://admin.010814.xyz" || origin == "" {
-			c.Header("Access-Control-Allow-Origin", "https://admin.010814.xyz")
+		// 允许前端域名访问API
+		allowedOrigins := []string{"https://admin.010814.xyz", "https://admin-api.010814.xyz"}
+		for _, allowed := range allowedOrigins {
+			if origin == allowed {
+				c.Header("Access-Control-Allow-Origin", origin)
+				break
+			}
 		}
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, AccessToken, X-CSRF-Token, Authorization, Token, Accept, Accept-Encoding, Origin, X-Requested-With")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
