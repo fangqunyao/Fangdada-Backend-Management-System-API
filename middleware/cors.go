@@ -9,15 +9,8 @@ import (
 
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		origin := c.Request.Header.Get("Origin")
-		// 允许前端域名访问API
-		allowedOrigins := []string{"https://admin.010814.xyz", "https://admin-api.010814.xyz"}
-		for _, allowed := range allowedOrigins {
-			if origin == allowed {
-				c.Header("Access-Control-Allow-Origin", origin)
-				break
-			}
-		}
+		// 直接设置允许的前端域名
+		c.Header("Access-Control-Allow-Origin", "https://admin.010814.xyz")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, AccessToken, X-CSRF-Token, Authorization, Token, Accept, Accept-Encoding, Origin, X-Requested-With")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
